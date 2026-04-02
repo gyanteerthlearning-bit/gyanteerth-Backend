@@ -1,3 +1,8 @@
+import sys
+import os
+# Fix for Vercel: add Backend/ directory to Python path so all local modules resolve
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI,HTTPException,Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
