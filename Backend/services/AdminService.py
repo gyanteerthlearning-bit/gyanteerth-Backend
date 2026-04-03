@@ -744,7 +744,7 @@ class AdminService:
             except Exception as e:
                 # Add a small debug hint to see which client ID is being used
                 import os
-                debug_hint = os.getenv("GOOGLE_CLIENT_ID", "MISSING")[-5:]
+                debug_hint = os.getenv("GOOGLE_CLIENT_ID", "MISSING")[:15]
                 raise HTTPException(
                     status_code=502,
                     detail=f"Failed to generate Google Meet link (Debug:{debug_hint}): {str(e)}"
