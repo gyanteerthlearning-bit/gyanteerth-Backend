@@ -3,16 +3,30 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
+from sqlalchemy.pool import NullPool
 import time
 import os
 
 load_dotenv()
-db_url = os.environ["DATABASE_URL"]
+db_url = os.getenv("DATABASE_URL")
 
-DB_URL= db_url
-engine = create_engine(DB_URL)
-SessionLocal = sessionmaker(bind=engine)
-session=SessionLocal(bind=engine)
+if not db_url:
+    raise RuntimeError(
+        "DATABASE_URL environment variable is not set. "
+        "Please add it in Vercel Project Settings → Environment Variables."
+    )
+
+DB_URL = db_url
+engine = create_engine(
+    DB_URL,
+    poolclass=NullPool,           # REQUIRED for Vercel serverless — no persistent connections
+    connect_args={
+        "connect_timeout": 10,    # fail fast instead of hanging
+        "gssencmode": "disable",  # prevents IPv6/GSSAPI negotiation that fails on Vercel
+        "sslmode": "require",     # Supabase requires SSL
+    },
+)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 def get_db():
     db = SessionLocal()
