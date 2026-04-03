@@ -29,11 +29,18 @@
 
 <script>
 
+// Dynamic backend URL — works on localhost, LAN, and production without changes
+const _port = window.location.port;
+const _isStdPort = (_port === "80" || _port === "443" || _port === "");
+const BASE_URL = _isStdPort
+    ? `${window.location.protocol}//${window.location.hostname}`
+    : `${window.location.protocol}//${window.location.hostname}:8000`;
+
 function handleCredentialResponse(response){
 
     console.log("Google ID Token:", response.credential);
 
-    fetch("http://localhost:8000/gyantreeth/v1/auth_checkpoint/google-signup",{
+    fetch(`${BASE_URL}/gyantreeth/v1/auth_checkpoint/google-signup`,{
         method:"POST",
         headers:{
             "Content-Type":"application/json"
