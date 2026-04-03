@@ -716,7 +716,7 @@ class AdminService:
                 )
             
             current_time = datetime.now(timezone.utc)  
-            min_allowed_time = current_time + timedelta(minutes=10)
+            min_allowed_time = current_time 
             
             # Make Start_time timezone-aware for comparison if it's naive
             start_aware = data.Start_time
@@ -726,7 +726,7 @@ class AdminService:
             if start_aware <= min_allowed_time:
                 raise HTTPException(
                     status_code=400,
-                    detail="Start time must be at least 10 minutes from now"
+                    detail="Start time must be in the future"
                 )
 
             # Auto-generate Google Meet URL using Google Calendar API
@@ -742,9 +742,12 @@ class AdminService:
                     detail=f"Google Meet setup error: {str(e)}"
                 )
             except Exception as e:
+                # Add a small debug hint to see which client ID is being used
+                import os
+                debug_hint = os.getenv("GOOGLE_CLIENT_ID", "MISSING")[-5:]
                 raise HTTPException(
                     status_code=502,
-                    detail=f"Failed to generate Google Meet link: {str(e)}"
+                    detail=f"Failed to generate Google Meet link (Debug:{debug_hint}): {str(e)}"
                 )
 
             new_live = LiveCourseTable(
