@@ -4,8 +4,20 @@ from sqlalchemy.ext.declarative import declarative_base
 from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
 from sqlalchemy.pool import NullPool
+import socket
 import time
 import os
+
+# ── Force IPv4-only DNS resolution ───────────────────────────────────────────
+# Vercel's serverless runtime (AWS Lambda) cannot open outbound IPv6 sockets.
+# Supabase's direct DB host resolves to an IPv6 address, which causes
+# "Cannot assign requested address". This patch makes getaddrinfo always
+# request AF_INET (IPv4), so psycopg2 only ever tries IPv4 addresses.
+_orig_getaddrinfo = socket.getaddrinfo
+def _force_ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _force_ipv4_getaddrinfo
+# ─────────────────────────────────────────────────────────────────────────────
 
 load_dotenv()
 db_url = os.getenv("DATABASE_URL")
