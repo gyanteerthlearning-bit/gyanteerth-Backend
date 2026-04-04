@@ -102,3 +102,13 @@ class EnrollCourseRequest(BaseModel):
 class EnrollCourseResponse(BaseModel):
     enrollment_id: str
     message: str
+
+class MarkLiveAttendanceRequest(BaseModel):
+    live_class_id: str
+    module_id: str
+    attended_live: bool = False
+    watched_recording: bool = False
+
+class MarkLiveAttendanceResponse(BaseModel):
+    message: str
+    is_present: bool

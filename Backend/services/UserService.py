@@ -157,4 +157,44 @@ class UserService:
             ]
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        
+    async def mark_live_attendance(self, live_class_id: str, module_id: str, attended_live: bool, watched_recording: bool, token: dict, db: Session):
+        from Models.Progress.LiveAttendanceTable import LiveAttendanceTable
+        user_id = token.get("user_id")
+
+        if not attended_live and not watched_recording:
+            raise HTTPException(status_code=400, detail="Must mark either live attendance or recording view as true")
+
+        attendance = db.query(LiveAttendanceTable).filter(
+            LiveAttendanceTable.User_ID == user_id,
+            LiveAttendanceTable.Live_Class_ID == live_class_id
+        ).first()
+
+        if attendance:
+            # Update existing attendance
+            if attended_live:
+                attendance.Attended_Live = True
+            if watched_recording:
+                attendance.Watched_Recording = True
+            attendance.Is_Present = True
+            attendance.updated_at = datetime.utcnow()
+            message = "Attendance updated successfully"
+        else:
+            # Create new attendance record
+            attendance = LiveAttendanceTable(
+                Live_Attendance_ID=f"LIVE-ATT-{uuid.uuid4().hex[:8]}",
+                User_ID=user_id,
+                Live_Class_ID=live_class_id,
+                Module_ID=module_id,
+                Attended_Live=attended_live,
+                Watched_Recording=watched_recording,
+                Is_Present=True,
+                Completed_At=datetime.utcnow()
+            )
+            db.add(attendance)
+            message = "Attendance marked successfully"
+
+        db.commit()
+        return {
+            "message": message,
+            "is_present": attendance.Is_Present
+        }

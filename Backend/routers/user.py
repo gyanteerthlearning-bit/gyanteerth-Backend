@@ -6,7 +6,7 @@ from Database.DB import get_db
 from sqlalchemy.orm import Session
 from services.AuthService import user_Authorization
 from services.UserService import UserService
-from schemas.user import UpdateUserProfileRequest,EnrollCourseRequest,EnrollCourseResponse
+from schemas.user import UpdateUserProfileRequest,EnrollCourseRequest,EnrollCourseResponse, MarkLiveAttendanceRequest, MarkLiveAttendanceResponse
 from schemas.user import GenderEnum
 from schemas.user import UserProfile_response,update_profile_response
 from typing import Annotated
@@ -69,3 +69,14 @@ async def enroll_course_api(request: EnrollCourseRequest, db: Session = Depends(
 @router_user.get("/enrolled_courses", summary="Get Enrolled Courses", description="Fetches all courses a user is enrolled in.")
 async def enrolled_courses_detail(db:Session = Depends(get_db),token: object = Depends(user_Authorization())):
     return await UserService().enrolled_course(db,token)
+
+@router_user.post("/mark-live-attendance", response_model=MarkLiveAttendanceResponse, summary="Mark Live Attendance", description="Allows a user to mark that they attended a live session or watched the recording.")
+async def mark_live_attendance_api(request: MarkLiveAttendanceRequest, db: Session = Depends(get_db), token: dict = Depends(user_Authorization())):
+    return await UserService().mark_live_attendance(
+        live_class_id=request.live_class_id,
+        module_id=request.module_id,
+        attended_live=request.attended_live,
+        watched_recording=request.watched_recording,
+        token=token,
+        db=db
+    )
