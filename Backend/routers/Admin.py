@@ -175,7 +175,7 @@ async def update_option(option_id: str,data: UpdateOptionRequest,db: Session = D
     return await AdminService().update_option_service(option_id,data,db)
 
 @router_admin.get("/course/{course_id}/full-details", summary="Get Full Course Structure")
-async def get_full_course(course_id: str, db: Session = Depends(get_db),token: dict = Depends(admin_Authorization())):
+async def get_full_course(course_id: str, db: Session = Depends(get_db)):
     return await AdminService().get_full_course_details(course_id, db)
 
 @router_admin.get("/courses/ids-by-status", summary="Get Course IDs by Status")
