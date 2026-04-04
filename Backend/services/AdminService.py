@@ -2283,12 +2283,16 @@ class AdminService:
             ).scalar()
 
             if course.course_Type.lower() == "recorded":
-                if not video_exists or live_exists:
-                    return False, "Invalid video course content"
+                if not video_exists:
+                    return False, "Recorded courses must contain at least one video."
+                if live_exists:
+                    return False, "Recorded courses cannot contain live sessions."
 
             elif course.course_Type.lower() == "live":
-                if not live_exists or video_exists:
-                    return False, "Invalid live course content"
+                if not live_exists:
+                    return False, "Live courses must contain at least one scheduled live session."
+                if video_exists:
+                    return False, "Live courses cannot contain recorded videos."
 
                 future_live = db.query(
                     exists().where(
