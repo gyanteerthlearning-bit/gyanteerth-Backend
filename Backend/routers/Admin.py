@@ -70,8 +70,8 @@ async def create_category(data: CreateCategory,db: Session = Depends(get_db),tok
     return await AdminService().create_category(data, db,token)
 
 @router_admin.get("/get-categories",response_model=AllCategoriesResponse,summary="Get All Categories",description="Fetch all course categories with their subcategories in a hierarchical structure.")
-async def get_all_categories(db: Session = Depends(get_db),token: dict = Depends(admin_Authorization())):
-    return await AdminService().get_all_categories(db, token)
+async def get_all_categories(db: Session = Depends(get_db)):
+    return await AdminService().get_all_categories(db, None)
 
 @router_admin.put("/update-category/{category_id}",response_model=CategoryResponse,summary="Update Category",description="Allows admin to update category information.")
 async def update_category(category_id: str,data: UpdateCategory,db: Session = Depends(get_db),token: dict = Depends(admin_Authorization())):
@@ -179,11 +179,11 @@ async def get_full_course(course_id: str, db: Session = Depends(get_db)):
     return await AdminService().get_full_course_details(course_id, db)
 
 @router_admin.get("/courses/ids-by-status", summary="Get Course IDs by Status")
-async def get_course_ids_by_status(db: Session = Depends(get_db),token: dict = Depends(admin_Authorization())):
+async def get_course_ids_by_status(db: Session = Depends(get_db)):
     return await AdminService().get_course_ids_by_status(db)
 
 @router_admin.get("/instructor/{user_id}/live-sessions", summary="Get Instructor Live Sessions")
-async def get_live_sessions(user_id: str, db: Session = Depends(get_db),token: dict = Depends(admin_Authorization())):
+async def get_live_sessions(user_id: str, db: Session = Depends(get_db)):
     return await AdminService().get_instructor_live_sessions(user_id, db)
 
 @router_admin.delete(
