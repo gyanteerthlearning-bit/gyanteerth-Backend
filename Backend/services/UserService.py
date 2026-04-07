@@ -149,9 +149,9 @@ class UserService:
             return [
                 {
                     "course_id": course.course_id,
-                    "course_name": course.course_name,
+                    "course_name": course.course_title,
                     "course_description": course.course_description,
-                    "course_pic": course.course_pic
+                    "course_pic": course.thumbnail
                 }
                 for course in courses
             ]
