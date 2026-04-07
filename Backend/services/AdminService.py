@@ -28,6 +28,7 @@ import uuid
 import re
 from datetime import datetime, timedelta
 from utils.security import hash_password,create_refresh_token
+from Models.Progress.EnrollmentTable import EnrollmentTable
 from dotenv import load_dotenv
 load_dotenv()
 import os
@@ -114,6 +115,40 @@ class AdminService:
                 detail="An error occurred while creating the trainer profile"
             )
 
+
+    async def get_enrollment_stats(self, db: Session):
+        try:
+            # Query enrollment counts per course
+            stats = db.query(
+                CourseTable.course_id,
+                CourseTable.course_title,
+                func.count(EnrollmentTable.User_ID).label("enrolled_students")
+            ).outerjoin(
+                EnrollmentTable,
+                EnrollmentTable.Course_ID == CourseTable.course_id
+            ).group_by(
+                CourseTable.course_id,
+                CourseTable.course_title
+            ).all()
+
+            data = [
+                {
+                    "course_id": s.course_id,
+                    "course_title": s.course_title,
+                    "enrolled_students": s.enrolled_students
+                }
+                for s in stats
+            ]
+
+            return {
+                "status": True,
+                "data": data
+            }
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to fetch enrollment statistics: {str(e)}"
+            )
 
     async def get_trainer_profile(self, Data, token: dict, db: Session):
         try:

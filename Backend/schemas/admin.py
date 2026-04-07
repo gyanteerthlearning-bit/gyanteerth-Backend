@@ -866,3 +866,24 @@ class SwapModuleRequest(BaseModel):
 
 class ResetAssessmentResponse(BaseModel):
     message: str
+
+class EnrollmentStat(BaseModel):
+    course_id: str
+    course_title: str
+    enrolled_students: int
+
+class EnrollmentStatsResponse(BaseModel):
+    status: bool
+    data: List[EnrollmentStat]
+
+class StudentProgressDetail(BaseModel):
+    user_id: str
+    user_name: Optional[str]
+    progress_percentage: int
+    completed_modules: int
+    total_modules: int
+
+class CourseStudentsProgressResponse(BaseModel):
+    status: bool
+    course_id: str
+    data: List[StudentProgressDetail]
