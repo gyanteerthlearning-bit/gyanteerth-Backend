@@ -1,15 +1,15 @@
 from datetime import date
 from pydantic import ValidationError
-from fastapi import BackgroundTasks, FastAPI,HTTPException,Request,APIRouter,Depends, UploadFile, File,Form,Path
+from fastapi import BackgroundTasks, FastAPI,HTTPException,Request,APIRouter,Depends, UploadFile, File,Form,Path, Query
 from h11 import Data
 from Database.DB import get_db
 from sqlalchemy.orm import Session
-from services.AuthService import user_Authorization
+from services.AuthService import user_Authorization, full_Authorization
 from services.UserService import UserService
 from schemas.user import UpdateUserProfileRequest,EnrollCourseRequest,EnrollCourseResponse, MarkLiveAttendanceRequest, MarkLiveAttendanceResponse
 from schemas.user import GenderEnum
 from schemas.user import UserProfile_response,update_profile_response, SubmitFeedbackRequest, SubmitFeedbackResponse, PublicFeedbackResponse
-from typing import Annotated
+from typing import Annotated, Optional
 
 router_user = APIRouter()
 
@@ -108,10 +108,16 @@ async def submit_assessment_api(request: SubmitAssessmentRequest, db: Session = 
     )
 
 @router_user.get("/course/{course_id}/progress", response_model=CourseProgressResponse, summary="Get Course Progress")
-async def get_course_progress_api(course_id: str, db: Session = Depends(get_db), token: dict = Depends(user_Authorization())):
+async def get_course_progress_api(course_id: str, student_id: Optional[str] = Query(None), db: Session = Depends(get_db), token: dict = Depends(full_Authorization())):
     user_id = token.get("user_id")
+    role = token.get("role").lower()
+    
+    target_user_id = user_id
+    if student_id and role in ["admin", "trainer"]:
+        target_user_id = student_id
+        
     return await ProgressService().get_course_progress(
-        user_id=user_id,
+        user_id=target_user_id,
         course_id=course_id,
         db=db
     )

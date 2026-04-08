@@ -39,7 +39,7 @@ class user_Authorization(HTTPBearer):
             if not token:
                 raise HTTPException(status_code=401, detail="Invalid token")
 
-            if token.get("role") != "user":
+            if token.get("role").lower() != "user":
                 raise HTTPException(status_code=403, detail="Permission denied")
             return token
         
@@ -61,7 +61,7 @@ class admin_Authorization(HTTPBearer):
             if not token:
                 raise HTTPException(status_code=401, detail="Invalid token")
 
-            if token.get("role") != "admin":
+            if token.get("role").lower() != "admin":
                 raise HTTPException(status_code=403, detail="Permission denied")
             return token
         
@@ -83,7 +83,29 @@ class trainer_Authorization(HTTPBearer):
             if not token:
                 raise HTTPException(status_code=401, detail="Invalid token")
 
-            if token.get("role") != "trainer":
+            if token.get("role").lower() not in ["trainer", "admin"]:
+                raise HTTPException(status_code=403, detail="Permission denied")
+            return token
+        
+        except HTTPException:
+            raise   
+        except Exception as e:
+            print("Token decode error:", e)
+            raise HTTPException(status_code=401, detail=str(e))
+
+class full_Authorization(HTTPBearer):
+    def __init__(self, auto_error: bool = True):
+        super(full_Authorization, self).__init__(auto_error=auto_error)
+    async def __call__(self, request: Request ):
+        credentials: HTTPAuthorizationCredentials = await super(full_Authorization, self).__call__(request)
+        if not credentials:
+            raise HTTPException(status_code=401, detail="Invalid authorization code")
+        try:
+            token = decode_token(credentials.credentials)
+            if not token:
+                raise HTTPException(status_code=401, detail="Invalid token")
+
+            if token.get("role").lower() not in ["user", "trainer", "admin"]:
                 raise HTTPException(status_code=403, detail="Permission denied")
             return token
         
