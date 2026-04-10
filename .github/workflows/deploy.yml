@@ -15,7 +15,7 @@ jobs:
         with:
           host: 54.175.228.203
           username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.task_1 }}
           script: |
             cd ~/lms
             git pull origin main
