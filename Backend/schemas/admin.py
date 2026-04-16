@@ -28,8 +28,10 @@ class Trainer_update_request(BaseModel):
             }
         }
 
-class Trainer_email(BaseModel):
-    trainer_email:EmailStr
+class Trainer_status_update(BaseModel):
+    trainer_email: EmailStr
+    status: str
+
 
 class Trainerrequest(BaseModel):
     trainer_email: EmailStr

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from services.AuthService import admin_Authorization
 from schemas.user import GenderEnum
 from services.AdminService import AdminService
-from schemas.admin import Trainerrequest,trainer_request_get,Trainer_update_request,Trainer_email,CreateCategory,CategoryResponse,AllCategoriesResponse,UpdateCategory,CreateCourseRequest,CourseResponse,CourseDemoResponse,CreateCourseDemoRequest,CreateModuleRequest,CreateModuleResponse,CreateNotesRequest,CreateNotesResponse,CreateVideoRequest,CreateVideoResponse,CreateLiveCourseRequest,CreateLiveCourseResponse,CreateRecVideoRequest,CreateRecVideoResponse,CreateAssessmentRequest,CreateAssessmentResponse,CreateQuestionRequest,CreateQuestionResponse,CreateOptionRequest,CreateOptionResponse,SubCategoryResponse,UpdateCourseRequest,UpdateCourseResponse,UpdateCourseDemoRequest,UpdateCourseDemoResponse,UpdateModuleRequest,UpdateModuleResponse,UpdateNotesRequest,UpdateNotesResponse,UpdateVideoRequest,UpdateVideoResponse,UpdateLiveCourseRequest,UpdateLiveCourseResponse,UpdateRecVideoRequest,UpdateRecVideoResponse,UpdateAssessmentRequest,UpdateAssessmentResponse,UpdateQuestionRequest,UpdateQuestionResponse,UpdateOptionRequest,UpdateOptionResponse,SwapQuestionRequest,SwapOptionRequest,ActivationResponse,SwapModuleRequest
+from schemas.admin import Trainerrequest,trainer_request_get,Trainer_update_request,Trainer_status_update,CreateCategory,CategoryResponse,AllCategoriesResponse,UpdateCategory,CreateCourseRequest,CourseResponse,CourseDemoResponse,CreateCourseDemoRequest,CreateModuleRequest,CreateModuleResponse,CreateNotesRequest,CreateNotesResponse,CreateVideoRequest,CreateVideoResponse,CreateLiveCourseRequest,CreateLiveCourseResponse,CreateRecVideoRequest,CreateRecVideoResponse,CreateAssessmentRequest,CreateAssessmentResponse,CreateQuestionRequest,CreateQuestionResponse,CreateOptionRequest,CreateOptionResponse,SubCategoryResponse,UpdateCourseRequest,UpdateCourseResponse,UpdateCourseDemoRequest,UpdateCourseDemoResponse,UpdateModuleRequest,UpdateModuleResponse,UpdateNotesRequest,UpdateNotesResponse,UpdateVideoRequest,UpdateVideoResponse,UpdateLiveCourseRequest,UpdateLiveCourseResponse,UpdateRecVideoRequest,UpdateRecVideoResponse,UpdateAssessmentRequest,UpdateAssessmentResponse,UpdateQuestionRequest,UpdateQuestionResponse,UpdateOptionRequest,UpdateOptionResponse,SwapQuestionRequest,SwapOptionRequest,ActivationResponse,SwapModuleRequest
 from typing import Annotated
 from schemas.admin import EnrollmentStatsResponse,CourseStudentsProgressResponse, AllFeedbackAdminResponse, FeedbackStatusUpdateRequest
 from schemas.admin import ResetAssessmentResponse
@@ -63,9 +63,9 @@ async def all_trainer_email(db: Session = Depends(get_db),token: object = Depend
 async def update_trainer_profile(Data:Trainer_update_request,db: Session = Depends(get_db),token: object = Depends(admin_Authorization())):
     return await AdminService().update_trainer_service(Data,db,token)
 
-@router_admin.put("/inactive-trainer",summary="inactive the trainer-profile",description="inactive to trainer not assign the other any course by admin")
-async def inactive_trainer(Data:Trainer_email,db: Session = Depends(get_db),token: object = Depends(admin_Authorization())):
-    return await AdminService().inactive_trainer(Data,db,token)
+@router_admin.put("/inactive-trainer",summary="update trainer status",description="activate or inactivate trainer")
+async def update_trainer_status(Data:Trainer_status_update,db: Session = Depends(get_db),token: object = Depends(admin_Authorization())):
+    return await AdminService().update_trainer_status(Data,token, db)
 
 @router_admin.post("/create-category",response_model=CategoryResponse,summary="Create Course Category",description="""Allows an admin to create a new course category. 
 If Parent_ID is provided, the category will be created as a subcategory.If Parent_ID is null, it will be created as a main category.""")

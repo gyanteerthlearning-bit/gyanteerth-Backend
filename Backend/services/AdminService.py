@@ -326,7 +326,7 @@ class AdminService:
                 detail=f"Internal server error{str(e)}"
             )
         
-    async def inactive_trainer(self,Data,db:Session,token:dict):
+    async def update_trainer_status(self,Data,token:dict,db:Session):
         try:
             trainer = db.query(user_profile_table).filter(
                 user_profile_table.user_email == Data.trainer_email
@@ -335,20 +335,16 @@ class AdminService:
             if not trainer:
                 raise HTTPException(status_code=404, detail="No Trainers Found")
             
-            if(trainer.Status == "Inactive"):
-                trainer.Status = "active"
-                db.commit()
-                return {
-                    "success":True,
-                    "message":"successfully_trainer_profile_active"
-                }
-            else:
-                trainer.Status = "Inactive"
-                db.commit()
-                return {
-                    "success":True,
-                    "message":"successfully_trainer_profile_inactive"
-                }
+            if Data.status.lower() not in ["active", "inactive"]:
+                raise HTTPException(status_code=400, detail="Invalid status. Must be 'active' or 'inactive'.")
+
+            trainer.Status = Data.status.capitalize()
+            db.commit()
+
+            return {
+                "success":True,
+                "message": f"successfully_trainer_profile_{Data.status.lower()}"
+            }
         except HTTPException as http_err:
             raise http_err
     
