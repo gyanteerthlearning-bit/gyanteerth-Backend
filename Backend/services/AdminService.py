@@ -819,33 +819,12 @@ class AdminService:
                     detail="Start time must be in the future"
                 )
 
-            # Auto-generate Google Meet URL using Google Calendar API
-            try:
-                meet_url = create_google_meet(
-                    title=data.Title,
-                    start_time=data.Start_time,
-                    end_time=data.End_time,
-                )
-            except FileNotFoundError as e:
-                raise HTTPException(
-                    status_code=503,
-                    detail=f"Google Meet setup error: {str(e)}"
-                )
-            except Exception as e:
-                # Add a small debug hint to see which client ID is being used
-                import os
-                debug_hint = os.getenv("GOOGLE_CLIENT_ID", "MISSING")[:15]
-                raise HTTPException(
-                    status_code=502,
-                    detail=f"Failed to generate Google Meet link (Debug:{debug_hint}): {str(e)}"
-                )
-
             new_live = LiveCourseTable(
                 Live_ID=f"LIVE-{uuid.uuid4()}",
                 Course_ID=data.Course_ID,
                 Module_ID=data.Module_ID,
-                Meeting_URL=meet_url,
-                Provider="Google Meet",
+                Meeting_URL=data.Meeting_URL,
+                Provider=data.Provider or "Google Meet",
                 Start_time=data.Start_time,
                 End_time=data.End_time,
                 Status=data.Status

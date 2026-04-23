@@ -322,6 +322,8 @@ class CreateLiveCourseRequest(BaseModel):
     Course_ID: str
     Module_ID: str
     Title: str
+    Meeting_URL: str
+    Provider: Optional[str] = "Google Meet"
     Start_time: datetime
     End_time: datetime
     Status: str
@@ -332,6 +334,8 @@ class CreateLiveCourseRequest(BaseModel):
                 "Course_ID": "COURSE-1001",
                 "Module_ID": "MODULE-2001",
                 "Title": "Python Live Session 1",
+                "Meeting_URL": "https://meet.google.com/abc-defg-hij",
+                "Provider": "Google Meet",
                 "Start_time": "2026-03-20T10:00:00+05:30",
                 "End_time": "2026-03-20T11:30:00+05:30",
                 "Status": "Scheduled"
