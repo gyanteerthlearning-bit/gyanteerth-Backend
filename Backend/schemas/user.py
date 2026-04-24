@@ -18,10 +18,8 @@ class UpdateUserProfileRequest(BaseModel):
     @field_validator("user_name")
     @classmethod
     def validate_username(cls, value: str):
-        if " " in value:
-            raise ValueError("Username must not contain spaces")
-        if not re.fullmatch(r"[A-Za-z]+", value):
-            raise ValueError("Username must contain only letters")
+        if not re.fullmatch(r"[A-Za-z\s]+", value):
+            raise ValueError("Username must contain only letters and spaces")
         return value
     
     
